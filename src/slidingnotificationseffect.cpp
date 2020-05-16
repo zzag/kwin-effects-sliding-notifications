@@ -52,7 +52,7 @@ void SlidingNotificationsEffect::slotWindowAdded(EffectWindow *window)
 {
     if (effects->activeFullScreenEffect())
         return;
-    if (!window->isNotification())
+    if (!window->isNotification() && !window->isCriticalNotification())
         return;
 
     window->setData(WindowAddedGrabRole, QVariant::fromValue<void *>(this));
@@ -88,7 +88,7 @@ void SlidingNotificationsEffect::slotWindowClosed(EffectWindow *window)
 {
     if (effects->activeFullScreenEffect())
         return;
-    if (!window->isNotification())
+    if (!window->isNotification() && !window->isCriticalNotification())
         return;
 
     window->setData(WindowAddedGrabRole, QVariant::fromValue<void *>(this));
