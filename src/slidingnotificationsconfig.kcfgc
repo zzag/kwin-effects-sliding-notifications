@@ -1,0 +1,4 @@
+File=slidingnotificationsconfig.kcfg
+ClassName=SlidingNotificationsConfig
+Singleton=true
+Mutators=true
