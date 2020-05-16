@@ -1,6 +1,6 @@
 # Sliding Notifications Effect
 
-[Demo](https://youtu.be/6uzv8r8Oqf4)
+This is a simple effect that makes notification windows slide in and out when they are shown or hidden. [Demo](https://youtu.be/6uzv8r8Oqf4)
 
 
 #### Building from Git
