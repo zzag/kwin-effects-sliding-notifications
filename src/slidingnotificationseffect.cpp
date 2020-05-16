@@ -91,7 +91,7 @@ void SlidingNotificationsEffect::slotWindowClosed(EffectWindow *window)
     if (!window->isNotification() && !window->isCriticalNotification())
         return;
 
-    window->setData(WindowAddedGrabRole, QVariant::fromValue<void *>(this));
+    window->setData(WindowClosedGrabRole, QVariant::fromValue<void *>(this));
 
     forceBlurEffect(window);
     forceContrastEffect(window);
