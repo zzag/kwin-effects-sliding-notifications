@@ -27,7 +27,6 @@ find_package(KF5 REQUIRED COMPONENTS
 
 find_package(kwineffects REQUIRED COMPONENTS
     kwineffects
-    kwinglutils
 )
 
 add_subdirectory(src)
