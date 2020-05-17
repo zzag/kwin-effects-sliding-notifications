@@ -49,7 +49,6 @@ set(kwineffects_known_components
     kwinglutils
     kwinxrenderutils
 )
-set(kwineffects_default_components ${kwineffects_known_components})
 
 set(kwineffects_kwineffects_header "kwineffects.h")
 set(kwineffects_kwineffects_lib "kwineffects")
@@ -61,7 +60,6 @@ set(kwineffects_kwinxrenderutils_lib "kwinxrenderutils")
 ecm_find_package_parse_components(kwineffects
     RESULT_VAR kwineffects_components
     KNOWN_COMPONENTS ${kwineffects_known_components}
-    DEFAULT_COMPONENTS ${kwineffects_default_components}
 )
 
 ecm_find_package_handle_library_components(kwineffects
