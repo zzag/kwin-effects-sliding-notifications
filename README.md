@@ -2,6 +2,11 @@
 
 This is a simple effect that makes notification windows slide in and out when they are shown or hidden. [Demo](https://youtu.be/6uzv8r8Oqf4)
 
+#### Installing from Package Managers
+
+##### Arch
+
+Availible in the [kwin-effects-sliding-notifications-git](https://aur.archlinux.org/packages/kwin-effects-sliding-notifications-git/) package.
 
 #### Building from Git
 
