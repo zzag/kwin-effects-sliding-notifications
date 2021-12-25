@@ -8,10 +8,13 @@
 #include "slidingnotificationsconfig.h"
 
 SlidingNotificationsEffect::SlidingNotificationsEffect()
-    : m_slideInCurve(QEasingCurve::OutCubic)
-    , m_slideOutCurve(QEasingCurve::InCubic)
+    : m_slideInCurve(QEasingCurve::BezierSpline)
+    , m_slideOutCurve(QEasingCurve::BezierSpline)
 {
     reconfigure(ReconfigureAll);
+
+    m_slideInCurve.addCubicBezierSegment(QPointF(0, 0), QPointF(0, 1), QPointF(1, 1));
+    m_slideOutCurve.addCubicBezierSegment(QPointF(1, 0), QPointF(1, 1), QPointF(1, 1));
 
     connect(effects, &EffectsHandler::windowAdded,
             this, &SlidingNotificationsEffect::slotWindowAdded);
