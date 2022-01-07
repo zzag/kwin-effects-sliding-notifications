@@ -6,8 +6,7 @@
 
 #include "slidingnotificationseffect.h"
 
-KWIN_EFFECT_FACTORY_ENABLED(SlidingNotificationsEffectFactory,
-                            SlidingNotificationsEffect,
+KWIN_EFFECT_FACTORY_ENABLED(SlidingNotificationsEffect,
                             "metadata.json",
                             return false;)
 
