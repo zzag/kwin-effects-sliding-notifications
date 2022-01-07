@@ -6,11 +6,24 @@
 
 #pragma once
 
-#include <kwinanimationeffect.h>
+#include <kwineffects.h>
+
+#include <optional>
 
 using namespace KWin; // sue me...
 
-class SlidingNotificationsEffect : public AnimationEffect
+class SlideAnimation
+{
+public:
+    std::optional<std::chrono::milliseconds> lastTimestamp;
+    TimeLine timeline;
+
+    QRect clip;
+    QPointF startOffset;
+    QPointF endOffset;
+};
+
+class SlidingNotificationsEffect : public Effect
 {
     Q_OBJECT
 
@@ -19,9 +32,11 @@ public:
     ~SlidingNotificationsEffect() override;
 
     void reconfigure(ReconfigureFlags flags) override;
+    bool isActive() const override;
 
-protected:
-    void animationEnded(EffectWindow *window, Attribute, uint) override;
+    void prePaintWindow(EffectWindow *window, WindowPrePaintData &data, std::chrono::milliseconds presentTime) override;
+    void paintWindow(EffectWindow *window, int mask, QRegion region, WindowPaintData &data) override;
+    void postPaintScreen() override;
 
 private slots:
     void slotWindowAdded(EffectWindow *window);
@@ -35,5 +50,6 @@ private:
 
     QEasingCurve m_slideInCurve;
     QEasingCurve m_slideOutCurve;
-    int m_slideDuration;
+    QHash<EffectWindow *, SlideAnimation> m_animations;
+    std::chrono::milliseconds m_slideDuration;
 };

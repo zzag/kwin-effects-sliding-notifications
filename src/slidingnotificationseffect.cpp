@@ -29,7 +29,71 @@ SlidingNotificationsEffect::~SlidingNotificationsEffect()
 void SlidingNotificationsEffect::reconfigure(ReconfigureFlags)
 {
     SlidingNotificationsConfig::self()->read();
-    m_slideDuration = animationTime<SlidingNotificationsConfig>(500);
+    m_slideDuration = std::chrono::milliseconds(animationTime<SlidingNotificationsConfig>(500));
+}
+
+bool SlidingNotificationsEffect::isActive() const
+{
+    return !m_animations.isEmpty();
+}
+
+void SlidingNotificationsEffect::prePaintWindow(EffectWindow *window, WindowPrePaintData &data, std::chrono::milliseconds presentTime)
+{
+    auto it = m_animations.find(window);
+    if (it != m_animations.end()) {
+        data.setTransformed();
+        if (window->isDeleted()) {
+            window->enablePainting(EffectWindow::PAINT_DISABLED_BY_DELETE);
+        }
+
+        if (!it->lastTimestamp) {
+            it->lastTimestamp = presentTime;
+        }
+        it->timeline.update(presentTime - it->lastTimestamp.value());
+        it->lastTimestamp = presentTime;
+    }
+
+    effects->prePaintWindow(window, data, presentTime);
+}
+
+template <typename T>
+T interpolated(T a, T b, qreal progress)
+{
+    return a * (1 - progress) + b * progress;
+}
+
+void SlidingNotificationsEffect::paintWindow(EffectWindow *window, int mask, QRegion region, WindowPaintData &data)
+{
+    auto it = m_animations.constFind(window);
+    if (it != m_animations.constEnd()) {
+        region = it->clip.translated(window->pos());
+
+        const QPointF translation = interpolated(it->startOffset, it->endOffset, it->timeline.value());
+        data.translate(translation.x(), translation.y());
+    }
+
+    effects->paintWindow(window, mask, region, data);
+}
+
+void SlidingNotificationsEffect::postPaintScreen()
+{
+    for (auto it = m_animations.begin(); it != m_animations.end();) {
+        EffectWindow *window = it.key();
+        window->addRepaint(it->clip);
+
+        if (it->timeline.done()) {
+            if (window->isDeleted()) {
+                window->unrefWindow();
+            }
+            it = m_animations.erase(it);
+        } else {
+            unforceBlurEffect(window);
+            unforceContrastEffect(window);
+            ++it;
+        }
+    }
+
+    effects->postPaintScreen();
 }
 
 static Qt::Edge slideEdgeForWindow(EffectWindow *window)
@@ -63,28 +127,37 @@ void SlidingNotificationsEffect::slotWindowAdded(EffectWindow *window)
     forceBlurEffect(window);
     forceContrastEffect(window);
 
-    const QRect rect = window->expandedGeometry();
+    SlideAnimation animation;
+    animation.timeline.setEasingCurve(m_slideInCurve);
+    animation.timeline.setDuration(m_slideDuration);
 
-    FPx2 translationFrom;
+    const QRect rect = window->expandedGeometry();
+    const QRect workArea = effects->clientArea(MaximizeArea, window);
+
+    animation.clip = rect;
+    animation.clip.translate(-window->pos());
 
     switch (slideEdgeForWindow(window)) {
     case Qt::RightEdge:
-        translationFrom.set(rect.width(), 0);
+        animation.clip.setWidth(workArea.x() + workArea.width() - rect.x());
+        animation.startOffset = QPointF(animation.clip.width(), 0);
         break;
     case Qt::LeftEdge:
-        translationFrom.set(-rect.width(), 0);
+        animation.clip.setWidth(rect.x() + rect.width() - workArea.x());
+        animation.startOffset = QPointF(-animation.clip.width(), 0);
         break;
     case Qt::TopEdge:
-        translationFrom.set(0, -rect.height());
+        animation.clip.setHeight(rect.y() + rect.height() - workArea.y());
+        animation.startOffset = QPointF(0, -animation.clip.height());
         break;
     case Qt::BottomEdge:
-        translationFrom.set(0, rect.height());
+        animation.clip.setHeight(workArea.y() + workArea.height() - rect.y());
+        animation.startOffset = QPointF(0, animation.clip.height());
         break;
     }
 
-    animate(window, Translation, 0, m_slideDuration, FPx2(), m_slideInCurve, 0, translationFrom);
-    animate(window, Clip, 0, m_slideDuration, FPx2(1, 1), m_slideInCurve, 0, FPx2(1, 1));
-    animate(window, Opacity, 0, m_slideDuration, FPx2(1, 1), m_slideInCurve, 0, FPx2(0, 0));
+    m_animations[window] = animation;
+    window->addRepaintFull();
 }
 
 void SlidingNotificationsEffect::slotWindowClosed(EffectWindow *window)
@@ -95,37 +168,42 @@ void SlidingNotificationsEffect::slotWindowClosed(EffectWindow *window)
         return;
 
     window->setData(WindowClosedGrabRole, QVariant::fromValue<void *>(this));
+    window->refWindow();
 
     forceBlurEffect(window);
     forceContrastEffect(window);
 
-    const QRect rect = window->expandedGeometry();
+    SlideAnimation animation;
+    animation.timeline.setEasingCurve(m_slideOutCurve);
+    animation.timeline.setDuration(m_slideDuration);
 
-    FPx2 translationTo;
+    const QRect rect = window->expandedGeometry();
+    const QRect workArea = effects->clientArea(MaximizeArea, window);
+
+    animation.clip = rect;
+    animation.clip.translate(-window->pos());
 
     switch (slideEdgeForWindow(window)) {
     case Qt::RightEdge:
-        translationTo.set(rect.width(), 0);
+        animation.clip.setWidth(workArea.x() + workArea.width() - rect.x());
+        animation.endOffset = QPointF(animation.clip.width(), 0);
         break;
     case Qt::LeftEdge:
-        translationTo.set(-rect.width(), 0);
+        animation.clip.setWidth(rect.x() + rect.width() - workArea.x());
+        animation.endOffset = QPointF(-animation.clip.width(), 0);
         break;
     case Qt::TopEdge:
-        translationTo.set(0, -rect.height());
+        animation.clip.setHeight(rect.y() + rect.height() - workArea.y());
+        animation.endOffset = QPointF(0, -animation.clip.height());
         break;
     case Qt::BottomEdge:
-        translationTo.set(0, rect.height());
+        animation.clip.setHeight(workArea.y() + workArea.height() - rect.y());
+        animation.endOffset = QPointF(0, animation.clip.height());
         break;
     }
 
-    animate(window, Translation, 0, m_slideDuration, translationTo, m_slideOutCurve);
-    animate(window, Clip, 0, m_slideDuration, FPx2(1, 1), m_slideOutCurve, 0, FPx2(1, 1));
-}
-
-void SlidingNotificationsEffect::animationEnded(EffectWindow *window, Attribute, uint)
-{
-    unforceBlurEffect(window);
-    unforceContrastEffect(window);
+    m_animations[window] = animation;
+    window->addRepaintFull();
 }
 
 void SlidingNotificationsEffect::forceBlurEffect(EffectWindow *window)
