@@ -82,13 +82,13 @@ void SlidingNotificationsEffect::postPaintScreen()
         window->addRepaint(it->clip);
 
         if (it->timeline.done()) {
+            unforceBlurEffect(window);
+            unforceContrastEffect(window);
             if (window->isDeleted()) {
                 window->unrefWindow();
             }
             it = m_animations.erase(it);
         } else {
-            unforceBlurEffect(window);
-            unforceContrastEffect(window);
             ++it;
         }
     }
