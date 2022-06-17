@@ -42,15 +42,7 @@ void SlidingNotificationsEffect::prePaintWindow(EffectWindow *window, WindowPreP
     auto it = m_animations.find(window);
     if (it != m_animations.end()) {
         data.setTransformed();
-        if (window->isDeleted()) {
-            window->enablePainting(EffectWindow::PAINT_DISABLED_BY_DELETE);
-        }
-
-        if (!it->lastTimestamp) {
-            it->lastTimestamp = presentTime;
-        }
-        it->timeline.update(presentTime - it->lastTimestamp.value());
-        it->lastTimestamp = presentTime;
+        it->timeline.advance(presentTime);
     }
 
     effects->prePaintWindow(window, data, presentTime);
@@ -174,6 +166,7 @@ void SlidingNotificationsEffect::slotWindowClosed(EffectWindow *window)
     forceContrastEffect(window);
 
     SlideAnimation animation;
+    animation.visibleRef = KWin::EffectWindowVisibleRef(window, EffectWindow::PAINT_DISABLED_BY_DELETE);
     animation.timeline.setEasingCurve(m_slideOutCurve);
     animation.timeline.setDuration(m_slideDuration);
 

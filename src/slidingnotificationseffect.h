@@ -15,8 +15,8 @@ using namespace KWin; // sue me...
 class SlideAnimation
 {
 public:
-    std::optional<std::chrono::milliseconds> lastTimestamp;
     TimeLine timeline;
+    KWin::EffectWindowVisibleRef visibleRef;
 
     QRect clip;
     QPointF startOffset;
