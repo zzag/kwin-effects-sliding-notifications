@@ -120,7 +120,6 @@ void SlidingNotificationsEffect::slotWindowAdded(EffectWindow *window)
     forceContrastEffect(window);
 
     SlideAnimation animation;
-    animation.timeline.setDirection(KWin::TimeLine::Direction::Forward);
     animation.timeline.setEasingCurve(m_slideInCurve);
     animation.timeline.setDuration(m_slideDuration);
 
@@ -168,7 +167,6 @@ void SlidingNotificationsEffect::slotWindowClosed(EffectWindow *window)
 
     SlideAnimation animation;
     animation.visibleRef = KWin::EffectWindowVisibleRef(window, EffectWindow::PAINT_DISABLED_BY_DELETE);
-    animation.timeline.setDirection(KWin::TimeLine::Direction::Forward);
     animation.timeline.setEasingCurve(m_slideOutCurve);
     animation.timeline.setDuration(m_slideDuration);
 
