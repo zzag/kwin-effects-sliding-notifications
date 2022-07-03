@@ -6,8 +6,13 @@
 
 #include "slidingnotificationseffect.h"
 
+namespace KWin
+{
+
 KWIN_EFFECT_FACTORY_ENABLED(SlidingNotificationsEffect,
                             "metadata.json",
                             return false;)
+
+} // namespace KWin
 
 #include "main.moc"

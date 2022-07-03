@@ -7,6 +7,9 @@
 #include "slidingnotificationseffect.h"
 #include "slidingnotificationsconfig.h"
 
+namespace KWin
+{
+
 SlidingNotificationsEffect::SlidingNotificationsEffect()
     : m_slideInCurve(QEasingCurve::BezierSpline)
     , m_slideOutCurve(QEasingCurve::BezierSpline)
@@ -225,3 +228,5 @@ void SlidingNotificationsEffect::unforceContrastEffect(EffectWindow *window)
 {
     window->setData(WindowForceBackgroundContrastRole, QVariant());
 }
+
+} // namespace KWin

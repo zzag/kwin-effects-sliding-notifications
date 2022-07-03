@@ -8,7 +8,8 @@
 
 #include <kwineffects.h>
 
-using namespace KWin; // sue me...
+namespace KWin
+{
 
 class SlideAnimation
 {
@@ -51,3 +52,5 @@ private:
     QHash<EffectWindow *, SlideAnimation> m_animations;
     std::chrono::milliseconds m_slideDuration;
 };
+
+} // namespace KWin
