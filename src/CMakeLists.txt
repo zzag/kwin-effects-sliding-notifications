@@ -18,7 +18,7 @@ target_link_libraries(kwin4_effect_slidingnotifications
     KF5::CoreAddons
     KF5::WindowSystem
 
-    kwineffects::kwineffects
+    KWinEffects::kwineffects
 )
 
 install(TARGETS kwin4_effect_slidingnotifications DESTINATION ${PLUGIN_INSTALL_DIR}/kwin/effects/plugins/)
