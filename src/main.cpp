@@ -10,4 +10,4 @@ KWIN_EFFECT_FACTORY_ENABLED(SlidingNotificationsEffect,
                             "metadata.json",
                             return false;)
 
-#include "slidingnotificationsplugin.moc"
+#include "main.moc"
