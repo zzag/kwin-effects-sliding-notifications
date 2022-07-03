@@ -96,23 +96,28 @@ static Qt::Edge slideEdgeForWindow(EffectWindow *window)
     const int screenCenterX = screenRect.x() + screenRect.width() / 2;
     const int screenCenterY = screenRect.y() + screenRect.height() / 2;
 
-    if (windowRect.x() + windowRect.width() < screenCenterX)
+    if (windowRect.x() + windowRect.width() < screenCenterX) {
         return Qt::LeftEdge;
-    if (windowRect.x() > screenCenterX)
+    }
+    if (windowRect.x() > screenCenterX) {
         return Qt::RightEdge;
+    }
 
-    if (windowRect.y() + windowRect.height() < screenCenterY)
+    if (windowRect.y() + windowRect.height() < screenCenterY) {
         return Qt::TopEdge;
-    else
+    } else {
         return Qt::BottomEdge;
+    }
 }
 
 void SlidingNotificationsEffect::slotWindowAdded(EffectWindow *window)
 {
-    if (effects->activeFullScreenEffect() || effects->isScreenLocked())
+    if (effects->activeFullScreenEffect() || effects->isScreenLocked()) {
         return;
-    if (!window->isNotification() && !window->isCriticalNotification())
+    }
+    if (!window->isNotification() && !window->isCriticalNotification()) {
         return;
+    }
 
     window->setData(WindowAddedGrabRole, QVariant::fromValue<void *>(this));
 
@@ -154,10 +159,12 @@ void SlidingNotificationsEffect::slotWindowAdded(EffectWindow *window)
 
 void SlidingNotificationsEffect::slotWindowClosed(EffectWindow *window)
 {
-    if (effects->activeFullScreenEffect() || effects->isScreenLocked())
+    if (effects->activeFullScreenEffect() || effects->isScreenLocked()) {
         return;
-    if (!window->isNotification() && !window->isCriticalNotification())
+    }
+    if (!window->isNotification() && !window->isCriticalNotification()) {
         return;
+    }
 
     window->setData(WindowClosedGrabRole, QVariant::fromValue<void *>(this));
     window->refWindow();
