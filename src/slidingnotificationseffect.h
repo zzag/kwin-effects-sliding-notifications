@@ -28,7 +28,6 @@ class SlidingNotificationsEffect : public Effect
 
 public:
     explicit SlidingNotificationsEffect();
-    ~SlidingNotificationsEffect() override;
 
     void reconfigure(ReconfigureFlags flags) override;
     bool isActive() const override;

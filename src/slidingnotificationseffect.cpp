@@ -25,10 +25,6 @@ SlidingNotificationsEffect::SlidingNotificationsEffect()
             this, &SlidingNotificationsEffect::slotWindowClosed);
 }
 
-SlidingNotificationsEffect::~SlidingNotificationsEffect()
-{
-}
-
 void SlidingNotificationsEffect::reconfigure(ReconfigureFlags)
 {
     SlidingNotificationsConfig::self()->read();
