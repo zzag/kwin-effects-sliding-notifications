@@ -109,7 +109,7 @@ static Qt::Edge slideEdgeForWindow(EffectWindow *window)
 
 void SlidingNotificationsEffect::slotWindowAdded(EffectWindow *window)
 {
-    if (effects->activeFullScreenEffect())
+    if (effects->activeFullScreenEffect() || effects->isScreenLocked())
         return;
     if (!window->isNotification() && !window->isCriticalNotification())
         return;
@@ -154,7 +154,7 @@ void SlidingNotificationsEffect::slotWindowAdded(EffectWindow *window)
 
 void SlidingNotificationsEffect::slotWindowClosed(EffectWindow *window)
 {
-    if (effects->activeFullScreenEffect())
+    if (effects->activeFullScreenEffect() || effects->isScreenLocked())
         return;
     if (!window->isNotification() && !window->isCriticalNotification())
         return;
