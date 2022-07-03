@@ -29,7 +29,7 @@ SlidingNotificationsEffect::~SlidingNotificationsEffect()
 void SlidingNotificationsEffect::reconfigure(ReconfigureFlags)
 {
     SlidingNotificationsConfig::self()->read();
-    m_slideDuration = std::chrono::milliseconds(animationTime<SlidingNotificationsConfig>(500));
+    m_slideDuration = std::chrono::milliseconds(animationTime<SlidingNotificationsConfig>(250));
 }
 
 bool SlidingNotificationsEffect::isActive() const
