@@ -8,8 +8,6 @@
 
 #include <kwineffects.h>
 
-#include <optional>
-
 using namespace KWin; // sue me...
 
 class SlideAnimation
