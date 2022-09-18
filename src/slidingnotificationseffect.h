@@ -17,7 +17,7 @@ public:
     TimeLine timeline;
     KWin::EffectWindowVisibleRef visibleRef;
 
-    QRect clip;
+    QRectF clip;
     QPointF startOffset;
     QPointF endOffset;
 };

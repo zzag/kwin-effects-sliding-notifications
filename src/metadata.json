@@ -12,7 +12,6 @@
         "Icon": "preferences-system-windows-effect-slidingnotifications",
         "Id": "kwin4_effect_slidingnotifications",
         "License": "GPL",
-        "Name": "Sliding Notifications",
-        "ServiceTypes": ["KWin/Effect"]
+        "Name": "Sliding Notifications"
     }
 }

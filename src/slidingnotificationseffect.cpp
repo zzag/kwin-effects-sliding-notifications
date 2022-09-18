@@ -57,7 +57,7 @@ void SlidingNotificationsEffect::paintWindow(EffectWindow *window, int mask, QRe
 {
     auto it = m_animations.constFind(window);
     if (it != m_animations.constEnd()) {
-        region = it->clip.translated(window->pos());
+        region = it->clip.translated(window->pos()).toAlignedRect();
 
         const QPointF translation = interpolated(it->startOffset, it->endOffset, it->timeline.value());
         data.translate(translation.x(), translation.y());
@@ -89,11 +89,11 @@ void SlidingNotificationsEffect::postPaintScreen()
 
 static Qt::Edge slideEdgeForWindow(EffectWindow *window)
 {
-    const QRect screenRect = effects->clientArea(ScreenArea, window);
-    const QRect windowRect = window->frameGeometry();
+    const QRectF screenRect = effects->clientArea(ScreenArea, window);
+    const QRectF windowRect = window->frameGeometry();
 
-    const int screenCenterX = screenRect.x() + screenRect.width() / 2;
-    const int screenCenterY = screenRect.y() + screenRect.height() / 2;
+    const qreal screenCenterX = screenRect.x() + screenRect.width() / 2;
+    const qreal screenCenterY = screenRect.y() + screenRect.height() / 2;
 
     if (windowRect.x() + windowRect.width() < screenCenterX) {
         return Qt::LeftEdge;
@@ -127,8 +127,8 @@ void SlidingNotificationsEffect::slotWindowAdded(EffectWindow *window)
     animation.timeline.setEasingCurve(m_slideInCurve);
     animation.timeline.setDuration(m_slideDuration);
 
-    const QRect rect = window->expandedGeometry();
-    const QRect workArea = effects->clientArea(MaximizeArea, window);
+    const QRectF rect = window->expandedGeometry();
+    const QRectF workArea = effects->clientArea(MaximizeArea, window);
 
     animation.clip = rect;
     animation.clip.translate(-window->pos());
@@ -176,8 +176,8 @@ void SlidingNotificationsEffect::slotWindowClosed(EffectWindow *window)
     animation.timeline.setEasingCurve(m_slideOutCurve);
     animation.timeline.setDuration(m_slideDuration);
 
-    const QRect rect = window->expandedGeometry();
-    const QRect workArea = effects->clientArea(MaximizeArea, window);
+    const QRectF rect = window->expandedGeometry();
+    const QRectF workArea = effects->clientArea(MaximizeArea, window);
 
     animation.clip = rect;
     animation.clip.translate(-window->pos());
