@@ -70,7 +70,7 @@ void SlidingNotificationsEffect::postPaintScreen()
 {
     for (auto it = m_animations.begin(); it != m_animations.end();) {
         EffectWindow *window = it.key();
-        effects->addRepaint(it->clip.translated(window->pos()));
+        effects->addRepaint(it->clip.translated(window->pos()).toRect());
 
         if (it->timeline.done()) {
             unforceBlurEffect(window);
