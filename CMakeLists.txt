@@ -4,7 +4,7 @@ project(kwin-effects-sliding-notifications)
 set(KF5_MIN_VERSION "5.58.0")
 set(QT_MIN_VERSION "5.12.0")
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
