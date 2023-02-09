@@ -33,7 +33,7 @@ find_package(XCB REQUIRED COMPONENTS
     XCB
 )
 
-find_package(KWinEffects 5.26.0 REQUIRED COMPONENTS
+find_package(KWinEffects 5.27.0 REQUIRED COMPONENTS
     kwineffects
 )
 
