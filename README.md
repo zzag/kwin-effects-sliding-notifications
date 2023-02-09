@@ -10,7 +10,7 @@ This is a simple effect that makes notification windows slide in and out when th
 You will need the following dependencies to build this effect:
 
 * CMake
-* any C++14 enabled compiler
+* any C++20 enabled compiler
 * Qt
 * libkwineffects
 * KDE Frameworks 5:
