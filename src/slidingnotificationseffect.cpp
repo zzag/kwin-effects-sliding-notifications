@@ -7,17 +7,16 @@
 #include "slidingnotificationseffect.h"
 #include "slidingnotificationsconfig.h"
 
+#include <kwin/effect/effecthandler.h>
+
 namespace KWin
 {
 
 SlidingNotificationsEffect::SlidingNotificationsEffect()
-    : m_slideInCurve(QEasingCurve::BezierSpline)
-    , m_slideOutCurve(QEasingCurve::BezierSpline)
+    : m_slideInCurve(QEasingCurve::OutCubic)
+    , m_slideOutCurve(QEasingCurve::InCubic)
 {
     reconfigure(ReconfigureAll);
-
-    m_slideInCurve.addCubicBezierSegment(QPointF(0, 0), QPointF(0, 1), QPointF(1, 1));
-    m_slideOutCurve.addCubicBezierSegment(QPointF(1, 0), QPointF(1, 1), QPointF(1, 1));
 
     connect(effects, &EffectsHandler::windowAdded,
             this, &SlidingNotificationsEffect::slotWindowAdded);
@@ -28,7 +27,7 @@ SlidingNotificationsEffect::SlidingNotificationsEffect()
 void SlidingNotificationsEffect::reconfigure(ReconfigureFlags)
 {
     SlidingNotificationsConfig::self()->read();
-    m_slideDuration = std::chrono::milliseconds(animationTime<SlidingNotificationsConfig>(500));
+    m_slideDuration = std::chrono::milliseconds(animationTime<SlidingNotificationsConfig>(std::chrono::milliseconds(200)));
 }
 
 bool SlidingNotificationsEffect::isActive() const
@@ -53,7 +52,7 @@ T interpolated(T a, T b, qreal progress)
     return a * (1 - progress) + b * progress;
 }
 
-void SlidingNotificationsEffect::paintWindow(EffectWindow *window, int mask, QRegion region, WindowPaintData &data)
+void SlidingNotificationsEffect::paintWindow(const RenderTarget &renderTarget, const RenderViewport &viewport, EffectWindow *window, int mask, QRegion region, WindowPaintData &data)
 {
     auto it = m_animations.constFind(window);
     if (it != m_animations.constEnd()) {
@@ -63,7 +62,7 @@ void SlidingNotificationsEffect::paintWindow(EffectWindow *window, int mask, QRe
         data.translate(translation.x(), translation.y());
     }
 
-    effects->paintWindow(window, mask, region, data);
+    effects->paintWindow(renderTarget, viewport, window, mask, region, data);
 }
 
 void SlidingNotificationsEffect::postPaintScreen()
@@ -75,9 +74,6 @@ void SlidingNotificationsEffect::postPaintScreen()
         if (it->timeline.done()) {
             unforceBlurEffect(window);
             unforceContrastEffect(window);
-            if (window->isDeleted()) {
-                window->unrefWindow();
-            }
             it = m_animations.erase(it);
         } else {
             ++it;
@@ -87,26 +83,20 @@ void SlidingNotificationsEffect::postPaintScreen()
     effects->postPaintScreen();
 }
 
-static Qt::Edge slideEdgeForWindow(EffectWindow *window)
+static std::optional<Qt::Edge> slideEdgeForWindow(EffectWindow *window)
 {
     const QRectF screenRect = effects->clientArea(ScreenArea, window);
     const QRectF windowRect = window->frameGeometry();
 
-    const qreal screenCenterX = screenRect.x() + screenRect.width() / 2;
-    const qreal screenCenterY = screenRect.y() + screenRect.height() / 2;
-
-    if (windowRect.x() + windowRect.width() < screenCenterX) {
+    if (std::abs(screenRect.left() - windowRect.left()) < windowRect.width() / 2) {
         return Qt::LeftEdge;
     }
-    if (windowRect.x() > screenCenterX) {
+
+    if (std::abs(screenRect.right() - windowRect.right()) < windowRect.width() / 2) {
         return Qt::RightEdge;
     }
 
-    if (windowRect.y() + windowRect.height() < screenCenterY) {
-        return Qt::TopEdge;
-    } else {
-        return Qt::BottomEdge;
-    }
+    return std::nullopt;
 }
 
 void SlidingNotificationsEffect::slotWindowAdded(EffectWindow *window)
@@ -118,6 +108,11 @@ void SlidingNotificationsEffect::slotWindowAdded(EffectWindow *window)
         return;
     }
 
+    const std::optional<Qt::Edge> slideEdge = slideEdgeForWindow(window);
+    if (!slideEdge.has_value()) {
+        return;
+    }
+
     window->setData(WindowAddedGrabRole, QVariant::fromValue<void *>(this));
 
     forceBlurEffect(window);
@@ -126,6 +121,7 @@ void SlidingNotificationsEffect::slotWindowAdded(EffectWindow *window)
     SlideAnimation animation;
     animation.timeline.setEasingCurve(m_slideInCurve);
     animation.timeline.setDuration(m_slideDuration);
+    animation.deletedRef = EffectWindowDeletedRef(window);
 
     const QRectF rect = window->expandedGeometry();
     const QRectF workArea = effects->clientArea(MaximizeArea, window);
@@ -133,7 +129,7 @@ void SlidingNotificationsEffect::slotWindowAdded(EffectWindow *window)
     animation.clip = rect;
     animation.clip.translate(-window->pos());
 
-    switch (slideEdgeForWindow(window)) {
+    switch (slideEdge.value()) {
     case Qt::RightEdge:
         animation.clip.setWidth(workArea.x() + workArea.width() - rect.x());
         animation.startOffset = QPointF(animation.clip.width(), 0);
@@ -165,16 +161,20 @@ void SlidingNotificationsEffect::slotWindowClosed(EffectWindow *window)
         return;
     }
 
+    const std::optional<Qt::Edge> slideEdge = slideEdgeForWindow(window);
+    if (!slideEdge.has_value()) {
+        return;
+    }
+
     window->setData(WindowClosedGrabRole, QVariant::fromValue<void *>(this));
-    window->refWindow();
 
     forceBlurEffect(window);
     forceContrastEffect(window);
 
     SlideAnimation animation;
-    animation.visibleRef = KWin::EffectWindowVisibleRef(window, EffectWindow::PAINT_DISABLED_BY_DELETE);
     animation.timeline.setEasingCurve(m_slideOutCurve);
     animation.timeline.setDuration(m_slideDuration);
+    animation.deletedRef = EffectWindowDeletedRef(window);
 
     const QRectF rect = window->expandedGeometry();
     const QRectF workArea = effects->clientArea(MaximizeArea, window);
@@ -182,7 +182,7 @@ void SlidingNotificationsEffect::slotWindowClosed(EffectWindow *window)
     animation.clip = rect;
     animation.clip.translate(-window->pos());
 
-    switch (slideEdgeForWindow(window)) {
+    switch (slideEdge.value()) {
     case Qt::RightEdge:
         animation.clip.setWidth(workArea.x() + workArea.width() - rect.x());
         animation.endOffset = QPointF(animation.clip.width(), 0);

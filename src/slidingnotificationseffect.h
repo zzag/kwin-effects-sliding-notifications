@@ -6,7 +6,9 @@
 
 #pragma once
 
-#include <kwineffects.h>
+#include <kwin/effect/effect.h>
+#include <kwin/effect/effectwindow.h>
+#include <kwin/effect/timeline.h>
 
 namespace KWin
 {
@@ -15,7 +17,7 @@ class SlideAnimation
 {
 public:
     TimeLine timeline;
-    KWin::EffectWindowVisibleRef visibleRef;
+    EffectWindowDeletedRef deletedRef;
 
     QRectF clip;
     QPointF startOffset;
@@ -33,10 +35,10 @@ public:
     bool isActive() const override;
 
     void prePaintWindow(EffectWindow *window, WindowPrePaintData &data, std::chrono::milliseconds presentTime) override;
-    void paintWindow(EffectWindow *window, int mask, QRegion region, WindowPaintData &data) override;
+    void paintWindow(const RenderTarget &renderTarget, const RenderViewport &viewport, EffectWindow *window, int mask, QRegion region, WindowPaintData &data) override;
     void postPaintScreen() override;
 
-private slots:
+private Q_SLOTS:
     void slotWindowAdded(EffectWindow *window);
     void slotWindowClosed(EffectWindow *window);
 

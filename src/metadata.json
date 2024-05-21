@@ -10,7 +10,6 @@
         "Description": "Sliding animation for notification windows",
         "EnabledByDefault": false,
         "Icon": "preferences-system-windows-effect-slidingnotifications",
-        "Id": "kwin4_effect_slidingnotifications",
         "License": "GPL",
         "Name": "Sliding Notifications"
     }

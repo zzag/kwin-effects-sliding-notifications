@@ -1,22 +1,22 @@
-kcoreaddons_add_plugin(kwin4_effect_slidingnotifications INSTALL_NAMESPACE "kwin/effects/plugins")
+kcoreaddons_add_plugin(slidingnotifications INSTALL_NAMESPACE "kwin/effects/plugins")
 
-target_sources(kwin4_effect_slidingnotifications PRIVATE
+target_sources(slidingnotifications PRIVATE
     main.cpp
     slidingnotificationseffect.cpp
 )
 
-kconfig_add_kcfg_files(kwin4_effect_slidingnotifications
+kconfig_add_kcfg_files(slidingnotifications
     slidingnotificationsconfig.kcfgc
 )
 
-target_link_libraries(kwin4_effect_slidingnotifications
-    Qt5::Core
-    Qt5::Gui
+target_link_libraries(slidingnotifications
+    Qt6::Core
+    Qt6::Gui
 
-    KF5::ConfigCore
-    KF5::ConfigGui
-    KF5::CoreAddons
-    KF5::WindowSystem
+    KF6::ConfigCore
+    KF6::ConfigGui
+    KF6::CoreAddons
+    KF6::WindowSystem
 
-    KWinEffects::kwineffects
+    KWin::kwin
 )
