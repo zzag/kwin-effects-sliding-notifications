@@ -5,7 +5,7 @@
 This is a simple effect that makes notification windows slide in and out when they are shown or hidden. [Demo](https://youtu.be/6uzv8r8Oqf4)
 
 
-#### Building from Git
+## Building from Git
 
 You will need the following dependencies to build this effect:
 
@@ -13,27 +13,34 @@ You will need the following dependencies to build this effect:
 * any C++20 enabled compiler
 * Qt
 * libkwineffects
-* KDE Frameworks 5:
+* KDE Frameworks:
     - Config
     - CoreAddons
     - Extra CMake Modules
     - WindowSystem
 
-On Arch Linux
+### On Arch Linux
 
 ```sh
 sudo pacman -S cmake extra-cmake-modules kwin
 ```
 
-On Fedora
+### On Fedora
 
+#### Plasma 6.x
+```sh
+sudo dnf install cmake extra-cmake-modules kf6-kconfig-devel \
+    kf6-kconfigwidgets-devel kf6-kcoreaddons-devel kf6-kwindowsystem-devel \
+    kwin-devel libepoxy-devel qt6-qtbase-devel
+```
+#### Plasma 5.x
 ```sh
 sudo dnf install cmake extra-cmake-modules kf5-kconfig-devel \
-    kf5-kconfigwwidgets-devel kf5-kcoreaddons-devel kf5-kwindowsystem-devel \
+    kf5-kconfigwidgets-devel kf5-kcoreaddons-devel kf5-kwindowsystem-devel \
     kwin-devel libepoxy-devel qt5-qtbase-devel
 ```
 
-On Ubuntu
+### On Ubuntu
 
 ```sh
 sudo apt install cmake extra-cmake-modules kwin-dev \
