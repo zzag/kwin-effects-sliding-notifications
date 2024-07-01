@@ -27,18 +27,12 @@ sudo pacman -S cmake extra-cmake-modules kwin
 
 ### On Fedora
 
-#### Plasma 6.x
 ```sh
 sudo dnf install cmake extra-cmake-modules kf6-kconfig-devel \
     kf6-kconfigwidgets-devel kf6-kcoreaddons-devel kf6-kwindowsystem-devel \
     kwin-devel libepoxy-devel qt6-qtbase-devel
 ```
-#### Plasma 5.x
-```sh
-sudo dnf install cmake extra-cmake-modules kf5-kconfig-devel \
-    kf5-kconfigwidgets-devel kf5-kcoreaddons-devel kf5-kwindowsystem-devel \
-    kwin-devel libepoxy-devel qt5-qtbase-devel
-```
+
 
 ### On Ubuntu
 
@@ -48,8 +42,7 @@ sudo apt install cmake extra-cmake-modules kwin-dev \
     libkf5windowsystem-dev qtbase5-dev
 ```
 
-After you installed all the required dependencies, you can build
-the effect:
+## After installing all the required dependencies, you can build the effect:
 
 ```sh
 git clone https://github.com/zzag/kwin-effects-sliding-notifications.git
