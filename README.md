@@ -42,7 +42,8 @@ sudo apt install cmake extra-cmake-modules kwin-dev \
     libkf5windowsystem-dev qtbase5-dev
 ```
 
-## After installing all the required dependencies, you can build the effect:
+After installing all the required dependencies, you can build 
+the effect:
 
 ```sh
 git clone https://github.com/zzag/kwin-effects-sliding-notifications.git
